@@ -306,7 +306,7 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const stageEl = document.getElementById('stage');
 const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
 const COARSE = matchMedia('(pointer: coarse)').matches;   // phones and tablets
-const pixelRatio = () => Math.min(devicePixelRatio, COARSE ? 1.5 : 2);   // dense phone screens stay sharp at 1.5×
+const pixelRatio = () => Math.min(devicePixelRatio, 2);   // 2× on phones too: sharp lines on 3× screens, still 30 fps
 renderer.setPixelRatio(pixelRatio());
 renderer.setSize(innerWidth, innerHeight);
 stageEl.appendChild(renderer.domElement);
@@ -661,17 +661,17 @@ function buildFarm() {
 function buildGround() {
   const g = new THREE.Group();
   const fine = new THREE.GridHelper(600, 60, 0x7cc4f2, 0x7cc4f2);
-  fine.material.transparent = true; fine.material.opacity = 0.3; fine.position.y = 0.02; g.add(fine);
+  fine.material.transparent = true; fine.material.opacity = 0.3; fine.position.y = 0.4; g.add(fine);   // 0.4 m up: no z-fighting with the pad on phones
   const s = 55;
-  g.add(poly([new V3(-s, .05, -s), new V3(s, .05, -s), new V3(s, .05, s), new V3(-s, .05, s)], M.mid, true));
+  g.add(poly([new V3(-s, .45, -s), new V3(s, .45, -s), new V3(s, .45, s), new V3(-s, .45, s)], M.mid, true));
   const hat = [];
   for (let c = -2 * s + 6; c < 2 * s; c += 7) {
     const x0 = Math.max(-s, -s - c), x1 = Math.min(s, s - c);
-    if (x1 > x0) hat.push(x0, .04, x0 + c, x1, .04, x1 + c);
+    if (x1 > x0) hat.push(x0, .42, x0 + c, x1, .42, x1 + c);
   }
   g.add(segs(hat, M.faint));
-  [150, 300].forEach(r => g.add(loop(r, .1, 160, M.dashB)));
-  g.add(poly([new V3(14, .3, -12), new V3(14, .3, -60), new V3(71, .3, -60)], M.acc)); // propellant line
+  [150, 300].forEach(r => g.add(loop(r, .5, 160, M.dashB)));
+  g.add(poly([new V3(14, .6, -12), new V3(14, .6, -60), new V3(71, .6, -60)], M.acc)); // propellant line
   g.add(segs([0, 1.5, -700, 0, 1.5, -640, -8, 1.5, -655, 0, 1.5, -700, 8, 1.5, -655, 0, 1.5, -700], M.line)); // north arrow
   return g;
 }
@@ -740,7 +740,7 @@ pickables.length = 0;
 scene.traverse(o => { if (o.isMesh && o.userData.key) pickables.push(o); });
 
 /* radar pulse ring */
-const pulse = loop(1, .15, 96, new THREE.LineBasicMaterial({ color: 0xffb547, transparent: true, opacity: .5 }));
+const pulse = loop(1, .5, 96, new THREE.LineBasicMaterial({ color: 0xffb547, transparent: true, opacity: .5 }));
 scene.add(pulse);
 
 
